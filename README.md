@@ -2,22 +2,20 @@
 
 This is an example implementation that reproduces the dependency-analysis plugin reporting a false
 positive of an unused dependency for which an android library module is referencing a single inline
-function provided by the `androidx.core:core-ktx:1.3.0` dependency. This is the out of running
-`./gradlew clean buildHealth --rerun-tasks` on this project in it's current state:
+function provided by the `androidx.core:core-ktx:1.3.0` dependency. When the library module uses the
+java srcDir, the dependency-analysis plugin does not report the ktx library as unused. Here is the
+output of running `./gradlew clean buildHealth --rerun-tasks` on this branch in it's current state:
 
 ```
-➜  unused-ktx-false-positive git:(master) ✗ ./gradlew clean buildHealth --rerun-tasks                                                                                                                                                                                                                 git:(master|●1✚1
-
-> Task :lib:compileDebugKotlin
-w: /Users/klehma685/Development/unused-ktx-false-positive/lib/src/main/kotlin/com/example/lib/AndroidModule.kt: (10, 27): 'PreferenceManager' is deprecated. Deprecated in Java
+➜  unused-ktx-false-positive git:(main) ✗ ./gradlew clean buildHealth --rerun-tasks                                                                                                                                                                                                                     git:(main|●1✚1
 
 > Task :lib:compileReleaseKotlin
-w: /Users/klehma685/Development/unused-ktx-false-positive/lib/src/main/kotlin/com/example/lib/AndroidModule.kt: (10, 27): 'PreferenceManager' is deprecated. Deprecated in Java
+w: /Users/klehma685/Development/unused-ktx-false-positive/lib/src/main/java/com/example/lib/AndroidModule.kt: (10, 27): 'PreferenceManager' is deprecated. Deprecated in Java
+
+> Task :lib:compileDebugKotlin
+w: /Users/klehma685/Development/unused-ktx-false-positive/lib/src/main/java/com/example/lib/AndroidModule.kt: (10, 27): 'PreferenceManager' is deprecated. Deprecated in Java
 
 > Task :lib:aggregateAdvice
-Unused dependencies which should be removed:
-- implementation("androidx.core:core-ktx:1.3.0")
-
 Transitively used dependencies that should be declared directly as indicated:
 - api("javax.inject:javax.inject:1")
 - implementation("androidx.core:core:1.3.0")
@@ -46,6 +44,6 @@ Deprecated Gradle features were used in this build, making it incompatible with 
 Use '--warning-mode all' to show the individual deprecation warnings.
 See https://docs.gradle.org/6.5/userguide/command_line_interface.html#sec:command_line_warnings
 
-BUILD SUCCESSFUL in 9s
+BUILD SUCCESSFUL in 8s
 146 actionable tasks: 146 executed
 ```
